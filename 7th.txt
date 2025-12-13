@@ -1,0 +1,52 @@
+use college
+
+db.students.insertOne({
+  roll: 101,
+  name: "Asha",
+  year: 2
+})
+
+db.students.insertMany([
+  { roll:101, name:"Asha", year:2, courses:["DSA","DBMS"], attendance:88 },
+  { roll:102, name:"Ravi", year:2, courses:["OS","Networks"], attendance:92 },
+  { roll:103, name:"Kavya", year:1, courses:["HTML","CSS"], attendance:79 }
+])
+
+1. find() – Fetch Multiple Documents
+
+db.students.find({ year: 2 })
+
+2. findOne() – Fetch a Single Document
+
+db.students.findOne({ roll: 101 })
+
+3. find() with Projection
+
+db.students.find(
+  { year: 2 },
+  { name: 1, roll: 1, _id: 0 }
+)
+
+
+1. updateOne() — Updates First Matching Document
+
+db.students.updateOne(
+  { roll: 101 },
+  { $set: { attendance: 90 } }
+)
+
+2. updateMany() — Updates All Matching Documents
+
+db.students.updateMany(
+  { year: 2 },
+  { $inc: { attendance: 5 } }
+)
+
+1. deleteOne() — Deletes First Matching Document
+
+db.students.deleteOne({ roll: 101 })
+
+2. deleteMany() — Deletes ALL Matching Documents
+
+db.students.deleteMany({ year: 1 })
+

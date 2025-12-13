@@ -1,0 +1,98 @@
+use bookstore; // or your DB name
+
+1) Insert sample documents
+
+db.BookInventory.insertMany([
+  { title: "The Silent Patient", author: "Alex Michaelides", category: "Fiction", availableCopies: 12, price: 399.99 },
+  { title: "Educated", author: "Tara Westover", category: "History", availableCopies: 5, price: 499.50 },
+  { title: "Introduction to Algorithms", author: "Thomas H. Cormen", category: "Education", availableCopies: 3, price: 2499.00 },
+  { title: "Brief Answers to the Big Questions", author: "Stephen Hawking", category: "Science", availableCopies: 7, price: 299.00 },
+  { title: "Norwegian Wood", author: "Haruki Murakami", category: "Fiction", availableCopies: 4, price: 199.00 },
+  { title: "A Brief History of Time", author: "Stephen Hawking", category: "Science", availableCopies: 6, price: 349.00 },
+  { title: "Learning Python", author: "Mark Lutz", category: "Education", availableCopies: 2, price: 1999.00 }
+]);
+
+
+2) Aggregation — total available per category & average price (rounded)
+
+db.BookInventory.aggregate([
+  {
+    $group: {
+      _id: "$category",
+      totalAvailable: { $sum: "$availableCopies" },
+      averagePrice: { $avg: "$price" }
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      category: "$_id",
+      totalAvailable: 1,
+      averagePrice: { $round: ["$averagePrice", 2] }  // round to 2 decimals
+    }
+  },
+  { $sort: { category: 1 } }
+])
+
+JSON result (example output):
+
+[
+  {
+    "category": "Education",
+    "totalAvailable": 5,
+    "averagePrice": 2249.00
+  },
+  {
+    "category": "Fiction",
+    "totalAvailable": 16,
+    "averagePrice": 299.50
+  },
+  {
+    "category": "History",
+    "totalAvailable": 5,
+    "averagePrice": 499.50
+  },
+  {
+    "category": "Science",
+    "totalAvailable": 13,
+    "averagePrice": 324.00
+  }
+]
+
+3) Aggregation — list all books in a specific category sorted by price desc
+
+Replace "Fiction" with any category you want.
+
+const CATEGORY = "Fiction";
+
+db.BookInventory.aggregate([
+  { $match: { category: CATEGORY } },
+  { $sort: { price: -1 } },
+  {
+    $project: {
+      _id: 0,
+      title: 1,
+      author: 1,
+      price: 1,
+      availableCopies: 1
+    }
+  }
+])
+
+JSON result for CATEGORY = "Fiction"
+
+[
+  {
+    "title": "The Silent Patient",
+    "author": "Alex Michaelides",
+    "price": 399.99,
+    "availableCopies": 12
+  },
+  {
+    "title": "Norwegian Wood",
+    "author": "Haruki Murakami",
+    "price": 199.00,
+    "availableCopies": 4
+  }
+]
+
