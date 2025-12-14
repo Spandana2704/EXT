@@ -38,8 +38,7 @@ function PasswordStrength(){
                 padding:"8px",
                 borderRadius:"5px",
                 width:"200px",
-                outline:"none"
-
+                outline:'none'
             }} 
             />
             <p>{strength && `strength:${strength}`}</p>
